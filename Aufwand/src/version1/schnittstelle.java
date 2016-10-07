@@ -2,6 +2,7 @@ package version1;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -9,6 +10,7 @@ public class schnittstelle {
 
 	Connection con = null;
 	Statement stmt = null;
+	ResultSet rs;
 
 	public schnittstelle() {
 		try // Treiber für mySQL laden
@@ -38,4 +40,17 @@ public class schnittstelle {
 			System.out.println("Statement NICHT erzeugt\n--------------------------------");
 		} // catch
 	}
+
+	public ResultSet projekte_laden() {
+
+		try {
+			// List l1 = new LinkedList();
+			rs = stmt.executeQuery("select * from projekte order by asc");
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return rs;
+
+	}
+
 }
