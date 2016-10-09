@@ -5,6 +5,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import Tabellen.Projekt;
+
+
 
 public class schnittstelle {
 
@@ -24,7 +30,7 @@ public class schnittstelle {
 
 		try // Connection zur Datenbank aufbauen
 		{
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/personal", "root", "");
+			con = DriverManager.getConnection("jdbc:mysql://lolstats.org:3306/fallstudie_2016", "fallstudie_user2", "passwort123!");
 			System.out.println("Connection zur Datenbank aufgebaut\n--------------------------------");
 		} // try
 		catch (SQLException e) {
@@ -41,15 +47,27 @@ public class schnittstelle {
 		} // catch
 	}
 
-	public ResultSet projekte_laden() {
-
+	public List<Projekt> projekte_laden() throws SQLException {	
+		
+		List<Projekt> projekte = new ArrayList<Projekt>();
+		
 		try {
 			// List l1 = new LinkedList();
-			rs = stmt.executeQuery("select * from projekte order by asc");
+			rs = stmt.executeQuery("select * from Projekt");
+			
+			while (rs.next()){
+				projekte.add(new Projekt(rs.getInt("ProjektID"), rs.getString("Name")));				
+			}
+			
+						
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
 		}
-		return rs;
+		
+
+		
+		
+		return projekte;
 
 	}
 
