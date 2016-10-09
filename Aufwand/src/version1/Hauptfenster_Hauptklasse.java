@@ -25,7 +25,7 @@ public class Hauptfenster_Hauptklasse extends Application {
         	AnchorPane page = (AnchorPane) FXMLLoader.load(Hauptfenster_Hauptklasse.class.getResource("Hauptfenster.fxml"));
             Scene scene = new Scene(page);
             primaryStage.setScene(scene);
-            primaryStage.setTitle("FXML is Simple");
+            primaryStage.setTitle("Projektverwaltungssoftware");
             primaryStage.show();
         } catch (Exception ex) {
             Logger.getLogger(Hauptfenster_Hauptklasse.class.getName()).log(Level.SEVERE, null, ex);

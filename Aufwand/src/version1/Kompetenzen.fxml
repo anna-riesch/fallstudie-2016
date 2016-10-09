@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="757.0" prefWidth="933.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="version1.KompetenzenController">
+   <children>
+      <TableView fx:id="tbl_mitarbeiterkompetenzTabelle" layoutX="141.0" layoutY="437.0" prefHeight="216.0" prefWidth="595.0">
+        <columns>
+          <TableColumn fx:id="tblCell_MKID" prefWidth="170.0" text="MitarbeiterkompetenzID" />
+            <TableColumn fx:id="tblCell_MKKompetenz" prefWidth="98.0" text="Kompetenz" />
+            <TableColumn fx:id="tblCell_MKMitarbeitername" minWidth="8.0" prefWidth="159.0" text="Mitarbeitername" />
+            <TableColumn fx:id="tblCell_MKKosten" minWidth="8.0" prefWidth="159.0" text="Kosten pro PT" />
+        </columns>
+      </TableView>
+      <TableView fx:id="tbl_mitarbeiterTabelle" layoutX="408.0" layoutY="118.0" prefHeight="200.0" prefWidth="488.0">
+        <columns>
+          <TableColumn fx:id="tblCell_MitarbeiterID" prefWidth="87.0" text="MitarbeiterID" />
+          <TableColumn fx:id="tblCell_MitarbeiterName" prefWidth="102.0" text="Name" />
+            <TableColumn fx:id="tblCell_MitarbeiterKosten" minWidth="7.0" prefWidth="108.0" text="Kosten pro PT" />
+            <TableColumn fx:id="tblCell_MitarbeiterMAK" prefWidth="55.0" text="MAK" />
+            <TableColumn fx:id="tblCell_MitarbeiterZugehoerigkeit" prefWidth="135.0" text="Zugehörigkeit" />
+        </columns>
+      </TableView>
+      <TableView fx:id="tbl_kompetenzTabelle" layoutX="74.0" layoutY="118.0" prefHeight="200.0" prefWidth="282.0">
+        <columns>
+          <TableColumn fx:id="tblCell_KompetenzID" prefWidth="106.0" text="KompetenzID" />
+          <TableColumn fx:id="tblCell_KompetenzName" prefWidth="78.0" text="Name" />
+        </columns>
+      </TableView>
+      <Text layoutX="74.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Kompetenzansicht für das Projekt:" wrappingWidth="184.431640625" />
+      <Label fx:id="label_projekt" layoutX="284.0" layoutY="22.0" prefHeight="17.0" prefWidth="92.0" text="Label" />
+      <Text layoutX="74.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="1. Welche Kompetenz wird benötigt?" wrappingWidth="224.431640625" />
+      <Text layoutX="408.0" layoutY="102.0" strokeType="OUTSIDE" strokeWidth="0.0" text="2. Welcher Mitarbeiter soll sie für dieses Projekt übernehmen?" wrappingWidth="348.431640625" />
+      <Text layoutX="135.0" layoutY="424.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bisher dem Projekt zugeteilte Mitarbeiterkompetenzen" wrappingWidth="348.431640625" />
+      <Button fx:id="button_mk_hinzufuegen" layoutX="370.0" layoutY="354.0" mnemonicParsing="false" text="Mitarbeiter hinzufügen" />
+      <Button fx:id="button_mk_loeschen" layoutX="140.0" layoutY="663.0" mnemonicParsing="false" text="Mitarbeiterkompetenz löschen" />
+      <Text layoutX="351.0" layoutY="371.0" strokeType="OUTSIDE" strokeWidth="0.0" text="3." wrappingWidth="10.431640625" />
+   </children>
+</AnchorPane>

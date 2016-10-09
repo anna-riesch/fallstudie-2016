@@ -11,13 +11,11 @@
    <children>
       <Button fx:id="button_projekt_anlegen" layoutX="64.0" layoutY="78.0" mnemonicParsing="false" onAction="#button_projekt_anlegen_click" text="Neues Projekt" />
       <Text layoutX="64.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Projektansicht" wrappingWidth="107.431640625" />
-      <Button fx:id="button_projekt_loeschen" layoutX="64.0" layoutY="499.0" mnemonicParsing="false" text="Projekt löschen..." />
+      <Button fx:id="button_projekt_loeschen" layoutX="64.0" layoutY="499.0" mnemonicParsing="false" onAction="#button_projekt_loeschen_click" text="Projekt löschen..." />
       <Button fx:id="button_phasenplanung" layoutX="317.0" layoutY="499.0" mnemonicParsing="false" text="Phasenplanung" />
-      <Button fx:id="button_kompetenzen" layoutX="198.0" layoutY="499.0" mnemonicParsing="false" text="Kompetenzen" />
-      <TextField fx:id="text_projektname" layoutX="64.0" layoutY="457.0" />
-      <TextField fx:id="text_projektbeschreibung" layoutX="228.0" layoutY="457.0" />
+      <Button fx:id="button_kompetenzen" layoutX="198.0" layoutY="499.0" mnemonicParsing="false" onAction="#button_kompetenzen_click" text="Kompetenzen" />
+      <TextField fx:id="text_projektname" layoutX="64.0" layoutY="457.0" onAction="#text_projektname_geklickt" />
       <Text layoutX="64.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Projektname" wrappingWidth="107.431640625" />
-      <Text layoutX="228.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Projektbeschreibung" wrappingWidth="149.00000050663948" />
       <TableView fx:id="tbl_projektTabelle" layoutX="64.0" layoutY="123.0" prefHeight="288.0" prefWidth="570.0">
         <columns>
           <TableColumn fx:id="tblCell_projektID" prefWidth="100.0" text="ID" />

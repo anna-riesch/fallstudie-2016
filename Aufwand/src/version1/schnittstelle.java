@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import Tabellen.Kompetenz;
 import Tabellen.Projekt;
 
 
@@ -52,7 +53,7 @@ public class schnittstelle {
 		List<Projekt> projekte = new ArrayList<Projekt>();
 		
 		try {
-			// List l1 = new LinkedList();
+			
 			rs = stmt.executeQuery("select * from Projekt");
 			
 			while (rs.next()){
@@ -64,11 +65,76 @@ public class schnittstelle {
 			System.out.println("Fehler: " + e);
 		}
 		
-
-		
 		
 		return projekte;
 
 	}
+	
+	
+	public List<Kompetenz> kompetenzen_laden() throws SQLException {	
+		
+		List<Kompetenz> kompetenzen = new ArrayList<Kompetenz>();
+		
+		try {
+			
+			rs = stmt.executeQuery("select * from Kompetenz");
+			
+			while (rs.next()){
+				kompetenzen.add(new Kompetenz(rs.getInt("KompetenzID"), rs.getString("Name")));				
+			}
+			
+						
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		
+		
+		return kompetenzen;
 
+	}
+	
+	
+	public int projektname_aendern(int id, String neu) throws SQLException {
+		
+		int anzahl = 0;
+		try {
+			
+			anzahl = stmt.executeUpdate("update Projekt set Name = '" + neu + "' where ProjektID = " + id);
+
+						
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+
+		return anzahl;
+	}
+
+	
+	
+	public int projekt_anlegen() throws SQLException {
+		
+		int anzahl = 0;
+		try {
+			
+			anzahl = stmt.executeUpdate("insert into Projekt (Name) values ('')");
+						
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return anzahl;
+	}
+	
+	public int projekt_loeschen(int id) throws SQLException {
+		
+		int anzahl = 0;
+		try {
+			
+			anzahl = stmt.executeUpdate("delete from Projekt where ProjektID = " + id);
+						
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return anzahl;
+	}
 }
