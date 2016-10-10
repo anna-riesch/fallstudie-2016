@@ -5,20 +5,27 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class OpenKompetenzStage extends Stage{
+public class OpenKompetenzStage extends Stage {
 
 	private Stage stage;
-	public static int pid;
-	public static String pname;
-	
+	private static int pid;
+
 	public OpenKompetenzStage(int projektID, String projektName) throws Exception {
 		stage = this;
 		Parent root = FXMLLoader.load(getClass().getResource("Kompetenzen.fxml"));
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
 		pid = projektID;
-		pname = projektName;
 		stage.setTitle(projektName);
 		stage.show();
 	}
+
+	public static int getpid() {
+		return pid;
+	}
+
+	public void setpid(int pid) {
+		this.pid = pid;
+	}
+
 }
