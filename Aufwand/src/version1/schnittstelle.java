@@ -19,6 +19,7 @@ public class schnittstelle {
 	Statement stmt = null;
 	ResultSet rs;
 
+	// test
 	public schnittstelle() {
 		try // Treiber für mySQL laden
 		{
