@@ -10,6 +10,7 @@ import java.util.List;
 
 import Tabellen.Kompetenz;
 import Tabellen.Mitarbeiterkompetenz;
+import Tabellen.Phasen;
 import Tabellen.Projekt;
 import Tabellen.Projektkompetenz;
 import Tabellen.Projektphasen;
@@ -199,23 +200,86 @@ public class schnittstelle {
 		return anzahl;
 	}
 
-	public List<Projektkompetenz> projektphasen_laden(int pid) throws SQLException {
+	public List<Projektphasen> projektphasen_laden(int pid) throws SQLException {
 
 		List<Projektphasen> projektphasen = new ArrayList<Projektphasen>();
 
 		try {
 			rs = stmt.executeQuery(
-					"select Projektkompetenz.ProjektkompetenzID, Kompetenz.Name as kname, Mitarbeiter.Name as mname, Mitarbeiter.Kosten_pro_PT from Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID where Projektkompetenz.ProjektID = "
-							+ pid);
+					"select Projektphase.ProjektphasenID, Phase.Name, Projektphase.Startdatum, Projektphase.Enddatum from Projektphase inner join Phase on Phase.PhasenID = Projektphase.PhasenID where Projektphase.ProjektID = "
+							+ pid+" ORDER BY Projektphase.ProjektphasenID ASC");
 			while (rs.next()) {
-				projektkompetenzen.add(new Projektkompetenz(rs.getInt("ProjektkompetenzID"), rs.getString("kname"),
-						rs.getString("mname"), rs.getInt("Kosten_pro_PT")));
+				projektphasen.add(new Projektphasen(rs.getInt("ProjektphasenID"), rs.getString("Name"), rs.getString("Startdatum"), rs.getString("Enddatum")));
 			}
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
 		}
-		return projektkompetenzen;
+		return projektphasen;
 
 	}
+	
+	public List<String> phasen_laden() throws SQLException {
+
+		List<String> phasen = new ArrayList<String>();
+
+		try {
+			rs = stmt.executeQuery("select * from Phase");
+			while (rs.next()) {
+				phasen.add(new String(rs.getString("Name")));
+			}
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return phasen;
+
+	}
+	
+	
+	
+	public int phasenname_aendern(int phid, String nameneu) throws SQLException {
+
+		int anzahl = 0;
+		try {
+
+			anzahl = stmt.executeUpdate("UPDATE Projektphase set PhasenID = (select PhasenID from Phase where Name = '"+nameneu+"') where ProjektphasenID = " + phid);
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return anzahl;
+	}
+	
+	public int startdatum_aendern(int phid, String datumneu) throws SQLException {
+
+		int anzahl = 0;
+		try {
+
+			anzahl = stmt.executeUpdate("UPDATE Projektphase set Startdatum = '"+datumneu+"' where ProjektphasenID = " + phid);
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return anzahl;
+	}
+	
+	
+	public int enddatum_aendern(int phid, String datumneu) throws SQLException {
+
+		int anzahl = 0;
+		try {
+
+			anzahl = stmt.executeUpdate("UPDATE Projektphase set Enddatum = '"+datumneu+"' where ProjektphasenID = " + phid);
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return anzahl;
+	}
+	
+	
+
 
 }

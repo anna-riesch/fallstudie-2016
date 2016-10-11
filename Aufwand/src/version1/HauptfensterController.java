@@ -110,5 +110,23 @@ public class HauptfensterController {
 		}
 
 	}
+	
+	
+	public void button_phasenplanung_click(ActionEvent event) throws SQLException {
+
+		if (tbl_projektTabelle.getSelectionModel().getSelectedItem() != null)
+			;
+		{
+
+			try {
+				new OpenPhasenStage(tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektid(),
+						tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektname());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
 
 }
