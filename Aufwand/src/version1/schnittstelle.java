@@ -12,6 +12,7 @@ import Tabellen.Kompetenz;
 import Tabellen.Mitarbeiterkompetenz;
 import Tabellen.Projekt;
 import Tabellen.Projektkompetenz;
+import Tabellen.Projektphasen;
 
 public class schnittstelle {
 
@@ -138,6 +139,7 @@ public class schnittstelle {
 			rs = stmt.executeQuery(
 					"select Mitarbeiter.MitarbeiterID, Mitarbeiter.Name, Mitarbeiter.Kosten_pro_PT, Mitarbeiter.MAK, Mitarbeiter.Zugehoerigkeit, Mitarbeiterkompetenz.MitarbeiterkompetenzID from Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiterkompetenz.MitarbeiterID = Mitarbeiter.MitarbeiterID where Mitarbeiterkompetenz.KompetenzID = "
 							+ kid);
+
 			while (rs.next()) {
 				mitarbeiterkompetenzen.add(new Mitarbeiterkompetenz(rs.getInt("MitarbeiterID"), rs.getString("Name"),
 						rs.getInt("Kosten_pro_PT"), rs.getInt("MAK"), rs.getString("Zugehoerigkeit"),
@@ -195,6 +197,25 @@ public class schnittstelle {
 			System.out.println("Fehler: " + e);
 		}
 		return anzahl;
+	}
+
+	public List<Projektkompetenz> projektphasen_laden(int pid) throws SQLException {
+
+		List<Projektphasen> projektphasen = new ArrayList<Projektphasen>();
+
+		try {
+			rs = stmt.executeQuery(
+					"select Projektkompetenz.ProjektkompetenzID, Kompetenz.Name as kname, Mitarbeiter.Name as mname, Mitarbeiter.Kosten_pro_PT from Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID where Projektkompetenz.ProjektID = "
+							+ pid);
+			while (rs.next()) {
+				projektkompetenzen.add(new Projektkompetenz(rs.getInt("ProjektkompetenzID"), rs.getString("kname"),
+						rs.getString("mname"), rs.getInt("Kosten_pro_PT")));
+			}
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return projektkompetenzen;
+
 	}
 
 }
