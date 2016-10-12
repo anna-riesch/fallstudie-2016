@@ -10,14 +10,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="433.0" prefWidth="876.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="version1.PhasenplanungController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="433.0" prefWidth="876.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="version1.PhasenplanungController">
    <children>
       <Text layoutX="14.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Phasenplanung für das Projekt:" wrappingWidth="184.431640625" />
       <Label fx:id="label_projekt" layoutX="224.0" layoutY="21.0" prefHeight="17.0" prefWidth="92.0" text="Label" />
       <TableView fx:id="tbl_phasenTabelle" layoutX="16.0" layoutY="107.0" prefHeight="200.0" prefWidth="363.0">
         <columns>
-            <TableColumn fx:id="tblCell_phasenID" prefWidth="18.0" text="ID" />
-          <TableColumn fx:id="tblCell_phasenname" prefWidth="146.0" text="Phasenname" />
+            <TableColumn fx:id="tblCell_phasenID" prefWidth="31.0" text="ID" />
+          <TableColumn fx:id="tblCell_phasenname" prefWidth="133.0" text="Phasenname" />
             <TableColumn fx:id="tblCell_startdatum" prefWidth="75.0" text="Startdatum" />
             <TableColumn fx:id="tblCell_enddatum" prefWidth="75.0" text="Enddatum" />
         </columns>
@@ -25,12 +25,12 @@
       <Text layoutX="16.0" layoutY="328.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Phase" wrappingWidth="107.431640625" />
       <Text layoutX="14.0" layoutY="380.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Startdatum" wrappingWidth="107.431640625" />
       <Text layoutX="131.0" layoutY="380.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enddatum" wrappingWidth="107.431640625" />
-      <TextField fx:id="text_pt" layoutX="508.0" layoutY="335.0" prefHeight="25.0" prefWidth="92.0" />
+      <TextField fx:id="text_pt" layoutX="508.0" layoutY="335.0" onAction="#text_personentage_geklickt" prefHeight="25.0" prefWidth="92.0" />
       <Text layoutX="508.0" layoutY="325.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Personentage" wrappingWidth="107.431640625" />
-      <TextField fx:id="text_rz" layoutX="391.0" layoutY="335.0" prefHeight="25.0" prefWidth="100.0" />
+      <TextField fx:id="text_rz" layoutX="391.0" layoutY="335.0" onAction="#text_risikozuschlag_geklickt" prefHeight="25.0" prefWidth="100.0" />
       <Text layoutX="391.0" layoutY="325.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Risikozuschlag" wrappingWidth="149.00000444054604" />
-      <Button fx:id="button_phase_anlegen" layoutX="16.0" layoutY="66.0" mnemonicParsing="false" text="Phase hinzufügen" />
-      <Button fx:id="button_phase_loeschen" layoutX="137.0" layoutY="66.0" mnemonicParsing="false" text="Phase löschen" />
+      <Button fx:id="button_phase_anlegen" layoutX="16.0" layoutY="66.0" mnemonicParsing="false" onAction="#button_phase_anlegen_click" text="Phase hinzufügen" />
+      <Button fx:id="button_phase_loeschen" layoutX="137.0" layoutY="66.0" mnemonicParsing="false" onAction="#button_phase_loeschen_click" text="Phase löschen" />
       <DatePicker fx:id="datum_start" layoutX="14.0" layoutY="392.0" onAction="#datum_start_geklickt" prefHeight="25.0" prefWidth="100.0" />
       <DatePicker fx:id="datum_ende" layoutX="131.0" layoutY="392.0" onAction="#datum_ende_geklickt" prefHeight="25.0" prefWidth="100.0" />
       <Button fx:id="button_pt_berechnen" layoutX="392.0" layoutY="392.0" mnemonicParsing="false" text="Personentage aus MAK berechnen" />
