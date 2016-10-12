@@ -61,7 +61,7 @@ public class KompetenzenController {
 	@FXML
 	private void initialize() throws SQLException {
 
-		System.out.println("Fenster startet");
+		System.out.println("(Initialisierung)Fenster startet");
 
 		db = new schnittstelle();
 
