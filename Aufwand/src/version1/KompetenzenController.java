@@ -33,8 +33,7 @@ public class KompetenzenController {
 	private TableColumn<Mitarbeiterkompetenz, String> tblCell_MitarbeiterName;
 	@FXML
 	private TableColumn<Mitarbeiterkompetenz, Integer> tblCell_MitarbeiterKosten;
-	@FXML
-	private TableColumn<Mitarbeiterkompetenz, Integer> tblCell_MitarbeiterMAK;
+
 	@FXML
 	private TableColumn<Mitarbeiterkompetenz, String> tblCell_MitarbeiterZugehoerigkeit;
 	@FXML
@@ -94,7 +93,7 @@ public class KompetenzenController {
 				.setCellValueFactory(cellData -> cellData.getValue().getmitarbeiteridProperty().asObject());
 		tblCell_MitarbeiterName.setCellValueFactory(cellData -> cellData.getValue().getmitarbeiternameProperty());
 		tblCell_MitarbeiterKosten.setCellValueFactory(cellData -> cellData.getValue().getkostenProperty().asObject());
-		tblCell_MitarbeiterMAK.setCellValueFactory(cellData -> cellData.getValue().getmakProperty().asObject());
+
 		tblCell_MitarbeiterZugehoerigkeit
 				.setCellValueFactory(cellData -> cellData.getValue().getzugehoerigkeitProperty());
 		tblCell_MitarbeiterMKID.setCellValueFactory(cellData -> cellData.getValue().getMkidProperty().asObject());
@@ -117,9 +116,11 @@ public class KompetenzenController {
 	public void button_mitarbeiter_loeschen_click(ActionEvent event) throws SQLException {
 		System.out
 				.println(tbl_mitarbeiterkompetenzTabelle.getSelectionModel().getSelectedItem().getprojektkompetenzID());
+
 		int anzahl = db.projektkompetenz_loeschen(
 				tbl_mitarbeiterkompetenzTabelle.getSelectionModel().getSelectedItem().getprojektkompetenzID());
 		System.out.println(anzahl + " Projektkompetenz(en) gelöscht");
+
 		this.projektkompetenz_aktualisieren();
 
 	}

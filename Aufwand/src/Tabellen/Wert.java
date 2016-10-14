@@ -13,14 +13,16 @@ public class Wert {
 	private StringProperty kompetenzname;
 	private IntegerProperty risikozuschlag;
 	private IntegerProperty personentage;
+	private IntegerProperty auslastung;
 	private DoubleProperty wert;
 
-	public Wert(int wertid, String kompetenzname, int risikozuschlag, int personentage, double wert) {
+	public Wert(int wertid, String kompetenzname, int risikozuschlag, int personentage, int auslastung, double wert) {
 
 		this.setwertid(wertid);
 		this.setkompetenzname(kompetenzname);
 		this.setrisikozuschlag(risikozuschlag);
 		this.setpersonentage(personentage);
+		this.setauslastung(auslastung);
 		this.setwert(wert);
 
 	}
@@ -71,6 +73,18 @@ public class Wert {
 
 	public void setpersonentage(int personentage) {
 		this.personentage = new SimpleIntegerProperty(personentage);
+	}
+
+	public int getauslastung() {
+		return auslastung.get();
+	}
+
+	public IntegerProperty getauslastungProperty() {
+		return auslastung;
+	}
+
+	public void setauslastung(int auslastung) {
+		this.auslastung = new SimpleIntegerProperty(auslastung);
 	}
 
 	public double getwert() {

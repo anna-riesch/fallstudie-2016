@@ -175,39 +175,12 @@ public class schnittstelle {
 
 			while (rs.next()) {
 				wievielekomp = rs.getRow();
-				int aktuellepid = rs.getInt("ProjektkompetenzID");
+
 				geaendert = stmt2.executeUpdate("insert into Wert (ProjektphasenID, ProjektkompetenzID) values ("
 						+ neueppid + ", " + rs.getInt("ProjektkompetenzID") + ")");
 				anzahl = anzahl + geaendert;
 				// wievielekomp = rs.getRow();
 			}
-
-		} catch (SQLException e) {
-			System.out.println("Fehler: " + e);
-		}
-		return anzahl;
-	}
-
-	public int projekt_loeschen(int id) throws SQLException {
-
-		int anzahl = 0;
-		try {
-
-			anzahl = stmt.executeUpdate("delete from Projekt where ProjektID = " + id);
-
-		} catch (SQLException e) {
-			System.out.println("Fehler: " + e);
-		}
-		return anzahl;
-	}
-
-	public int projektphase_loeschen(int phid) throws SQLException {
-
-		int anzahl = 0;
-		try {
-
-			stmt.executeUpdate("delete from Wert where ProjektphasenID = " + phid);
-			stmt.executeUpdate("delete from Projektphase where ProjektphasenID = " + phid);
 
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
@@ -221,12 +194,12 @@ public class schnittstelle {
 
 		try {
 			rs = stmt.executeQuery(
-					"select Mitarbeiter.MitarbeiterID, Mitarbeiter.Name, Mitarbeiter.Kosten_pro_PT, Mitarbeiter.MAK, Mitarbeiter.Zugehoerigkeit, Mitarbeiterkompetenz.MitarbeiterkompetenzID from Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiterkompetenz.MitarbeiterID = Mitarbeiter.MitarbeiterID where Mitarbeiterkompetenz.KompetenzID = "
+					"select Mitarbeiter.MitarbeiterID, Mitarbeiter.Name, Mitarbeiter.Kosten_pro_PT, Mitarbeiter.Zugehoerigkeit, Mitarbeiterkompetenz.MitarbeiterkompetenzID from Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiterkompetenz.MitarbeiterID = Mitarbeiter.MitarbeiterID where Mitarbeiterkompetenz.KompetenzID = "
 							+ kid);
 
 			while (rs.next()) {
 				mitarbeiterkompetenzen.add(new Mitarbeiterkompetenz(rs.getInt("MitarbeiterID"), rs.getString("Name"),
-						rs.getInt("Kosten_pro_PT"), rs.getInt("MAK"), rs.getString("Zugehoerigkeit"),
+						rs.getInt("Kosten_pro_PT"), rs.getString("Zugehoerigkeit"),
 						rs.getInt("MitarbeiterkompetenzID")));
 			}
 		} catch (SQLException e) {
@@ -258,11 +231,46 @@ public class schnittstelle {
 	public int projektkompetenz_anlegen(int mkid, int pid, int kid) throws SQLException {
 
 		int anzahl = 0;
+		int geaendert = 0;
 		try {
 
 			anzahl = stmt.executeUpdate(
 					"insert into Projektkompetenz (MitarbeiterkompetenzID, ProjektID, KompetenzID) values (" + mkid
 							+ ", " + pid + ", " + kid + ")");
+
+			rs = stmt.executeQuery(
+					"select max(ProjektkompetenzID) as neuepkid from Projektkompetenz where MitarbeiterkompetenzID = "
+							+ mkid);
+			rs.next();
+			int neuepkid = rs.getInt("neuepkid");
+
+			rs = stmt.executeQuery("select * from Projektphase where ProjektID = " + pid);
+
+			while (rs.next()) {
+
+				geaendert = stmt2.executeUpdate("insert into Wert (ProjektphasenID, ProjektkompetenzID) values ("
+						+ rs.getInt("ProjektphasenID") + ", " + neuepkid + ")");
+				anzahl = anzahl + geaendert;
+				// wievielekomp = rs.getRow();
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return anzahl;
+	}
+
+	public int projekt_loeschen(int id) throws SQLException {
+
+		int anzahl = 0;
+		try {
+
+			stmt.executeUpdate(
+					"delete from Wert where Wert.ProjektphasenID in (select ProjektphasenID from Projektphase where ProjektID = "
+							+ id + ")");
+			stmt.executeUpdate("delete from Projektphase where ProjektID = " + id);
+			stmt.executeUpdate("delete from Projektkompetenz where ProjektID = " + id);
+			anzahl = stmt.executeUpdate("delete from Projekt where ProjektID = " + id);
 
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
@@ -275,7 +283,22 @@ public class schnittstelle {
 		int anzahl = 0;
 		try {
 
+			anzahl = stmt.executeUpdate("delete from Wert where ProjektkompetenzID = " + pkid);
 			anzahl = stmt.executeUpdate("delete from Projektkompetenz where ProjektkompetenzID = " + pkid);
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return anzahl;
+	}
+
+	public int projektphase_loeschen(int phid) throws SQLException {
+
+		int anzahl = 0;
+		try {
+
+			stmt.executeUpdate("delete from Wert where ProjektphasenID = " + phid);
+			stmt.executeUpdate("delete from Projektphase where ProjektphasenID = " + phid);
 
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
@@ -307,7 +330,7 @@ public class schnittstelle {
 		List<String> phasen = new ArrayList<String>();
 
 		try {
-			rs = stmt.executeQuery("select * from Phase");
+			rs = stmt.executeQuery("select * from Phase order by Name ASC");
 			while (rs.next()) {
 				phasen.add(new String(rs.getString("Name")));
 			}
@@ -369,11 +392,11 @@ public class schnittstelle {
 
 		try {
 			rs = stmt.executeQuery(
-					"select Wert.WertID, Kompetenz.Name, Wert.Risikozuschlag, Wert.Personentage, Wert.Wert from Wert inner join (Projektkompetenz inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Wert.ProjektphasenID = "
+					"select Wert.WertID, Wert.Risikozuschlag, Wert.Personentage, Wert.Wert, Kompetenz.Name, Projektkompetenz.Auslastung, (Mitarbeiter.Kosten_pro_PT*Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))) as 'betrag' from Wert inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Wert.ProjektphasenID = "
 							+ phid);
 			while (rs.next()) {
 				werte.add(new Wert(rs.getInt("WertID"), rs.getString("Name"), rs.getInt("Risikozuschlag"),
-						rs.getInt("Personentage"), rs.getDouble("Wert")));
+						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getDouble("betrag")));
 			}
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);

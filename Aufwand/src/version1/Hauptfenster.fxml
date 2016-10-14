@@ -5,21 +5,25 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="fenster_haupt" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="593.0" prefWidth="777.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="version1.HauptfensterController">
+<AnchorPane fx:id="fenster_haupt" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="456.0" prefWidth="280.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="version1.HauptfensterController">
    <children>
-      <Button fx:id="button_projekt_anlegen" layoutX="64.0" layoutY="78.0" mnemonicParsing="false" onAction="#button_projekt_anlegen_click" text="Neues Projekt" />
-      <Text layoutX="64.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Projektansicht" wrappingWidth="107.431640625" />
-      <Button fx:id="button_projekt_loeschen" layoutX="64.0" layoutY="499.0" mnemonicParsing="false" onAction="#button_projekt_loeschen_click" text="Projekt löschen..." />
-      <Button fx:id="button_phasenplanung" layoutX="317.0" layoutY="499.0" mnemonicParsing="false" onAction="#button_phasenplanung_click" text="Phasenplanung" />
-      <Button fx:id="button_kompetenzen" layoutX="198.0" layoutY="499.0" mnemonicParsing="false" onAction="#button_kompetenzen_click" text="Kompetenzen" />
-      <TextField fx:id="text_projektname" layoutX="64.0" layoutY="457.0" onAction="#text_projektname_geklickt" />
-      <Text layoutX="64.0" layoutY="445.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Projektname" wrappingWidth="107.431640625" />
-      <TableView fx:id="tbl_projektTabelle" layoutX="64.0" layoutY="123.0" prefHeight="288.0" prefWidth="570.0">
+      <Button fx:id="button_projekt_anlegen" layoutX="26.0" layoutY="84.0" mnemonicParsing="false" onAction="#button_projekt_anlegen_click" text="Neues Projekt" />
+      <Text layoutX="26.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Projektansicht" wrappingWidth="197.431640625">
+         <font>
+            <Font size="20.0" />
+         </font></Text>
+      <Button fx:id="button_projekt_loeschen" layoutX="125.0" layoutY="84.0" mnemonicParsing="false" onAction="#button_projekt_loeschen_click" text="Projekt löschen..." />
+      <Button fx:id="button_phasenplanung" layoutX="133.0" layoutY="412.0" mnemonicParsing="false" onAction="#button_phasenplanung_click" text="Phasenplanung" />
+      <Button fx:id="button_kompetenzen" layoutX="26.0" layoutY="412.0" mnemonicParsing="false" onAction="#button_kompetenzen_click" text="Kompetenzen" />
+      <TextField fx:id="text_projektname" layoutX="26.0" layoutY="375.0" onAction="#text_projektname_geklickt" />
+      <Text layoutX="26.0" layoutY="363.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Projektname" wrappingWidth="107.431640625" />
+      <TableView fx:id="tbl_projektTabelle" layoutX="26.0" layoutY="119.0" prefHeight="224.0" prefWidth="224.0">
         <columns>
-          <TableColumn fx:id="tblCell_projektID" prefWidth="100.0" text="ID" />
-          <TableColumn fx:id="tblCell_projektName" minWidth="0.0" prefWidth="211.0" text="Name" />
+          <TableColumn fx:id="tblCell_projektID" prefWidth="27.0" text="ID" />
+          <TableColumn fx:id="tblCell_projektName" minWidth="0.0" prefWidth="194.0" text="Name" />
         </columns>
       </TableView>
    </children>
