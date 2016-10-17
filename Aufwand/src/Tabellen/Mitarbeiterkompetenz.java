@@ -10,17 +10,18 @@ public class Mitarbeiterkompetenz {
 	private IntegerProperty mitarbeiterid;
 	private StringProperty mitarbeitername;
 	private IntegerProperty kosten;
-
+	private IntegerProperty mak;
 	private StringProperty zugehoerigkeit;
 	private IntegerProperty mkid;
 
-	public Mitarbeiterkompetenz(int mitarbeiterid, String mitarbeitername, int kosten, String zugehoerigkeit,
+	public Mitarbeiterkompetenz(int mitarbeiterid, String mitarbeitername, int kosten, int mak, String zugehoerigkeit,
 			int mkid) {
 
 		this.setkosten(kosten);
 		this.setmitarbeitername(mitarbeitername);
 		this.setMkid(mkid);
 		this.setmitarbeiterid(mitarbeiterid);
+		this.setmak(mak);
 		this.setzugehoerigkeit(zugehoerigkeit);
 	}
 
@@ -82,6 +83,18 @@ public class Mitarbeiterkompetenz {
 
 	public void setmitarbeiterid(int mitarbeiterid) {
 		this.mitarbeiterid = new SimpleIntegerProperty(mitarbeiterid);
+	}
+
+	public int getmak() {
+		return mak.get();
+	}
+
+	public IntegerProperty getmakProperty() {
+		return mak;
+	}
+
+	public void setmak(int mak) {
+		this.mak = new SimpleIntegerProperty(mak);
 	}
 
 }

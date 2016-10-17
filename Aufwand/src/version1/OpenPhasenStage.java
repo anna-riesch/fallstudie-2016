@@ -12,11 +12,10 @@ public class OpenPhasenStage extends Stage {
 
 	public OpenPhasenStage(int projektID, String projektName) throws Exception {
 		stage = this;
-		pid = projektID;
 		Parent root = FXMLLoader.load(getClass().getResource("Phasenplanung.fxml"));
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
-
+		pid = projektID;
 		stage.setTitle(projektName);
 		stage.show();
 	}
