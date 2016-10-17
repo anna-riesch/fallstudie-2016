@@ -74,6 +74,7 @@ public class KompetenzenController {
 		tbl_kompetenzTabelle.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> {
 					try {
+						System.out.println("tbl_kompetenzTabelle_action");
 						kompetenz_geklickt(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem());
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -81,12 +82,12 @@ public class KompetenzenController {
 					}
 				});
 
-		this.projektkompetenz_aktualisieren();
+		// this.projektkompetenz_aktualisieren();
 
 	}
 
 	public void kompetenz_geklickt(Kompetenz k) throws SQLException {
-
+		System.out.println("kompetenz_geklickt");
 		mkData = FXCollections.observableArrayList(db.mitarbeiterkompetenzen_laden(k.getkid()));
 
 		tblCell_MitarbeiterID

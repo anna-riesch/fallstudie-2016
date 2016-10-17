@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -92,18 +91,21 @@ public class PhasenplanungController {
 
 		db = new schnittstelle();
 
-		this.phasen_aktualisieren(0);
+		ppData = FXCollections.observableArrayList(db.projektphasen_laden(projektid));
+
+		tblCell_phasenID.setCellValueFactory(cellData -> cellData.getValue().getprojektphasenIDProperty().asObject());
+		tblCell_phasenname.setCellValueFactory(cellData -> cellData.getValue().getphasennameProperty());
+		tblCell_startdatum.setCellValueFactory(cellData -> cellData.getValue().getstartdatumProperty());
+		tblCell_enddatum.setCellValueFactory(cellData -> cellData.getValue().getenddatumProperty());
+
+		tbl_phasenTabelle.setItems(ppData);
 
 		tbl_phasenTabelle.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			try {
 
-				// tbl_phasenTabelle.requestFocus();
-				// tbl_phasenTabelle.getSelectionModel().select(1);
 				System.out.println("tbl_phasenTabelle_action");
-				if (geklickt == true) {
-					this.phase_geklickt(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getphasenname());
-				}
-				geklickt = true;
+
+				phase_geklickt(tbl_phasenTabelle.getSelectionModel().getSelectedItem());
 
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -111,14 +113,13 @@ public class PhasenplanungController {
 			}
 		});
 
-		choice_phasenname.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			try {
-				choice_phasenname_auswahl(choice_phasenname.getValue());
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
+		/*
+		 * choice_phasenname.getSelectionModel().selectedItemProperty().
+		 * addListener((observable, oldValue, newValue) -> { try {
+		 * choice_phasenname_auswahl(choice_phasenname.getValue()); } catch
+		 * (SQLException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); } });
+		 */
 
 		tbl_kompetenzTabelle.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> {
@@ -136,31 +137,47 @@ public class PhasenplanungController {
 	}
 
 	@FXML
-	public void phase_geklickt(String phasenname) throws SQLException {
+	public void phase_geklickt(Projektphasen p) throws SQLException {
 		System.out.println("phase_geklickt");
-		choice_phasenname.setValue(null);
-		choice_phasenname.getItems().clear();
 
-		choice_phasenname.setValue(phasenname);
-		pData = FXCollections.observableArrayList(db.phasen_laden());
+		wData = FXCollections.observableArrayList(
+				db.werte_laden(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID()));
 
-		String array[] = new String[pData.size()];
-		for (int j = 0; j < pData.size(); j++) {
-			array[j] = pData.get(j);
-		}
+		tblCell_kompID.setCellValueFactory(cellData -> cellData.getValue().getwertidProperty().asObject());
+		tblCell_kompname.setCellValueFactory(cellData -> cellData.getValue().getkompetenznameProperty());
+		tblCell_komprisiko.setCellValueFactory(cellData -> cellData.getValue().getrisikozuschlagProperty().asObject());
+		tblCell_komppt.setCellValueFactory(cellData -> cellData.getValue().getpersonentageProperty().asObject());
+		tblCell_auslastung.setCellValueFactory(cellData -> cellData.getValue().getauslastungProperty().asObject());
+		tblCell_kompk.setCellValueFactory(cellData -> cellData.getValue().getwertProperty().asObject());
 
-		for (String k : array) {
-			choice_phasenname.getItems().add(k);
-		}
+		tbl_kompetenzTabelle.setItems(wData);
 
-		LocalDate sdt = LocalDate.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getstartdatum());
-		LocalDate edt = LocalDate.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getenddatum());
+		// this.kompetenzen_aktualisieren(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID());
 
-		datum_start.setValue(sdt);
-		datum_ende.setValue(edt);
-		int test = tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID();
-		geklickt = false;
-		this.kompetenzen_aktualisieren(test);
+		/*
+		 * choice_phasenname.setValue(null);
+		 * choice_phasenname.getItems().clear();
+		 * 
+		 * choice_phasenname.setValue(phasenname); pData =
+		 * FXCollections.observableArrayList(db.phasen_laden());
+		 * 
+		 * String array[] = new String[pData.size()]; for (int j = 0; j <
+		 * pData.size(); j++) { array[j] = pData.get(j); }
+		 * 
+		 * for (String k : array) { choice_phasenname.getItems().add(k); }
+		 * 
+		 * LocalDate sdt =
+		 * LocalDate.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem
+		 * ().getstartdatum()); LocalDate edt =
+		 * LocalDate.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem
+		 * ().getenddatum());
+		 * 
+		 * datum_start.setValue(sdt); datum_ende.setValue(edt); int test =
+		 * tbl_phasenTabelle.getSelectionModel().getSelectedItem().
+		 * getprojektphasenID(); geklickt = false;
+		 * 
+		 * this.kompetenzen_aktualisieren(test);
+		 */
 
 	}
 
@@ -174,7 +191,7 @@ public class PhasenplanungController {
 			int anzahl = db.phasenname_aendern(
 					tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID(), phasenname);
 			System.out.println(phasenname + anzahl);
-			this.phasen_aktualisieren(tbl_phasenTabelle.getSelectionModel().getSelectedIndex());
+			geklickt = false;
 
 		}
 
@@ -201,6 +218,7 @@ public class PhasenplanungController {
 		// tbl_phasenTabelle.getFocusModel().focus(pos);
 		// }
 		// });
+
 		tbl_phasenTabelle.setItems(ppData);
 
 	}
@@ -240,6 +258,7 @@ public class PhasenplanungController {
 
 	public void kompetenzen_aktualisieren(int phid) throws SQLException {
 		System.out.println("kompetenzen_aktualisieren");
+
 		wData = FXCollections.observableArrayList(
 				db.werte_laden(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID()));
 
@@ -249,7 +268,7 @@ public class PhasenplanungController {
 		tblCell_komppt.setCellValueFactory(cellData -> cellData.getValue().getpersonentageProperty().asObject());
 		tblCell_auslastung.setCellValueFactory(cellData -> cellData.getValue().getauslastungProperty().asObject());
 		tblCell_kompk.setCellValueFactory(cellData -> cellData.getValue().getwertProperty().asObject());
-
+		geklickt = false;
 		tbl_kompetenzTabelle.setItems(wData);
 
 	}
@@ -257,7 +276,6 @@ public class PhasenplanungController {
 	public void tbl_kompetenzTabelle_geklickt(Wert w) throws SQLException {
 		System.out.println("tbl_kompetenzTabelle_geklickt");
 
-		geklickt = false;
 		text_pt.setText(String.valueOf(w.getpersonentage()));
 		text_rz.setText(String.valueOf(w.getrisikozuschlag()));
 
@@ -306,7 +324,7 @@ public class PhasenplanungController {
 	@FXML
 	public void button_phase_anlegen_click(ActionEvent event) throws SQLException {
 		System.out.println("button_phase_anlegen_click");
-		geklickt = false;
+
 		int anzahl = db.projektphase_anlegen(projektid);
 		System.out.println(anzahl + " Werte angelegt");
 
