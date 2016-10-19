@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +67,10 @@ public class PhasenplanungController {
 	private TableColumn<Wert, Integer> tblCell_kompID;
 	@FXML
 	private TableColumn<Wert, String> tblCell_kompname;
+	@FXML
+	private TableColumn<Wert, String> tblCell_mitarbeitername;
+	@FXML
+	private TableColumn<Wert, String> tblCell_zugehoerigkeit;
 	@FXML
 	private TableColumn<Wert, Integer> tblCell_komprisiko;
 	@FXML
@@ -164,6 +169,8 @@ public class PhasenplanungController {
 
 		tblCell_kompID.setCellValueFactory(cellData -> cellData.getValue().getwertidProperty().asObject());
 		tblCell_kompname.setCellValueFactory(cellData -> cellData.getValue().getkompetenznameProperty());
+		tblCell_mitarbeitername.setCellValueFactory(cellData -> cellData.getValue().getmitarbeiternameProperty());
+		tblCell_zugehoerigkeit.setCellValueFactory(cellData -> cellData.getValue().getzugehoerigkeitProperty());
 		tblCell_komprisiko.setCellValueFactory(cellData -> cellData.getValue().getrisikozuschlagProperty().asObject());
 		tblCell_komppt.setCellValueFactory(cellData -> cellData.getValue().getpersonentageProperty().asObject());
 		tblCell_auslastung.setCellValueFactory(cellData -> cellData.getValue().getauslastungProperty().asObject());
@@ -172,6 +179,13 @@ public class PhasenplanungController {
 		tbl_kompetenzTabelle.setItems(wData);
 
 		text_phasenname.setText(p.getphasenname());
+
+		LocalDate startdt = LocalDate.parse(p.getstartdatum());
+		LocalDate enddt = LocalDate.parse(p.getenddatum());
+
+		datum_start.setValue(startdt);
+		datum_ende.setValue(enddt);
+
 		// pDataString = db.phasen_laden();
 		// choice_phasenname.setItems(pDataString);
 		// choice_phasenname.setValue(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getphasenname());
@@ -274,7 +288,10 @@ public class PhasenplanungController {
 					tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID(),
 					datum_start.getValue().toString());
 			System.out.println(anzahl + "START - Datensätze geändert.");
-			this.phasen_aktualisieren(tbl_phasenTabelle.getSelectionModel().getSelectedIndex());
+			int pos = tbl_phasenTabelle.getSelectionModel().getSelectedIndex();
+			this.phase_aktualisieren();
+			tbl_phasenTabelle.requestFocus();
+			tbl_phasenTabelle.getSelectionModel().select(pos);
 		}
 	}
 
@@ -290,7 +307,10 @@ public class PhasenplanungController {
 					tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID(),
 					datum_ende.getValue().toString());
 			System.out.println(anzahl + "END - Datensätze geändert.");
-			this.phasen_aktualisieren(tbl_phasenTabelle.getSelectionModel().getSelectedIndex());
+			int pos = tbl_phasenTabelle.getSelectionModel().getSelectedIndex();
+			this.phase_aktualisieren();
+			tbl_phasenTabelle.requestFocus();
+			tbl_phasenTabelle.getSelectionModel().select(pos);
 
 		}
 	}
@@ -408,7 +428,7 @@ public class PhasenplanungController {
 		wData.clear();
 		text_phasenname.setText("");
 		geklickt = false;
-		pDataString.clear();
+		// pDataString.clear();
 
 		// this.phasen_aktualisieren(tbl_phasenTabelle.getItems().size() - 2);
 

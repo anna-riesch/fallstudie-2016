@@ -430,11 +430,12 @@ public class schnittstelle {
 
 		try {
 			rs = stmt.executeQuery(
-					"select Wert.WertID, Wert.Risikozuschlag, Wert.Personentage, Wert.Wert, Kompetenz.Name, Projektkompetenz.Auslastung, (Mitarbeiter.Kosten_pro_PT*Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))) as 'betrag' from Wert inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Wert.ProjektphasenID = "
-							+ phid);
+					"select Wert.WertID, Wert.Risikozuschlag, Wert.Personentage, Wert.Wert, Kompetenz.Name, Projektkompetenz.Auslastung, (Mitarbeiter.Kosten_pro_PT*Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))) as 'betrag', Mitarbeiter.Name as MName, Mitarbeiter.Zugehoerigkeit from Wert inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Wert.ProjektphasenID = "
+							+ phid + " ORDER BY Kompetenz.Name ASC");
 			while (rs.next()) {
 				werte.add(new Wert(rs.getInt("WertID"), rs.getString("Name"), rs.getInt("Risikozuschlag"),
-						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getDouble("betrag")));
+						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getDouble("betrag"),
+						rs.getString("MName"), rs.getString("Zugehoerigkeit")));
 			}
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
