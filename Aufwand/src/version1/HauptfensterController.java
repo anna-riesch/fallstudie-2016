@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -35,6 +36,7 @@ public class HauptfensterController {
 
 	private ObservableList<Projekt> projektData;
 	private schnittstelle db;
+	public static boolean geklickt = true;
 
 	@FXML
 	private void initialize() throws SQLException {
@@ -51,12 +53,38 @@ public class HauptfensterController {
 
 		tbl_projektTabelle.getSelectionModel().selectedItemProperty().addListener((observable, oldValue,
 				newValue) -> tabelle_geklickt(tbl_projektTabelle.getSelectionModel().getSelectedItem()));
+
+		tbl_projektTabelle.setRowFactory(tv -> {
+			TableRow<Projekt> row = new TableRow<>();
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!row.isEmpty())) {
+					Projekt rowData = row.getItem();
+
+					if (tbl_projektTabelle.getSelectionModel().getSelectedItem() != null)
+						;
+					{
+
+						try {
+							new OpenPhasenStage(tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektid(),
+									tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektname());
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+			return row;
+		});
+
 	}
 
 	@FXML
 	public void tabelle_geklickt(Projekt p) {
-
-		text_projektname.setText(p.getProjektname());
+		if (geklickt == true) {
+			text_projektname.setText(p.getProjektname());
+		}
+		geklickt = true;
 
 	}
 
@@ -86,7 +114,7 @@ public class HauptfensterController {
 
 	@FXML
 	public void button_projekt_loeschen_click(ActionEvent event) throws SQLException {
-
+		geklickt = false;
 		int anzahl = db.projekt_loeschen(tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektid());
 		System.out.println(anzahl + " Projekt(e) gelöscht");
 		projektData = FXCollections.observableArrayList(db.projekte_laden());
@@ -102,6 +130,23 @@ public class HauptfensterController {
 
 			try {
 				new OpenKompetenzStage(tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektid(),
+						tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektname());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public void button_phasenplanung_click(ActionEvent event) throws SQLException {
+
+		if (tbl_projektTabelle.getSelectionModel().getSelectedItem() != null)
+			;
+		{
+
+			try {
+				new OpenPhasenStage(tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektid(),
 						tbl_projektTabelle.getSelectionModel().getSelectedItem().getProjektname());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

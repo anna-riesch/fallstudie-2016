@@ -5,15 +5,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class OpenKompetenzStage extends Stage {
+public class OpenPhasenStage extends Stage {
 
 	private Stage stage;
 	private static int pid;
 
-	public OpenKompetenzStage(int projektID, String projektName) throws Exception {
+	public OpenPhasenStage(int projektID, String projektName) throws Exception {
 		stage = this;
 		pid = projektID;
-		Parent root = FXMLLoader.load(getClass().getResource("Kompetenzen.fxml"));
+		Parent root = FXMLLoader.load(getClass().getResource("Phasenplanung.fxml"));
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
 

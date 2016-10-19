@@ -10,7 +10,7 @@ public class Kompetenz {
 	public Kompetenz(int kid, String name){
 		this.setkid(kid);
 		this.setname(name);
-
+ 
 	}
 	
 
