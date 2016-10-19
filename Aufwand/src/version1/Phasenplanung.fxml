@@ -51,7 +51,6 @@
             <TableColumn fx:id="tblCell_kompk" prefWidth="75.0" text="Kosten" />
          </columns>
       </TableView>
-      <ComboBox fx:id="choice_phasenname" layoutX="167.0" layoutY="323.0" prefHeight="25.0" prefWidth="140.0" visible="false" />
-      <TextField fx:id="text_phasenname" layoutX="13.0" layoutY="323.0" onAction="#phasenname_uebernehmen" prefHeight="25.0" prefWidth="212.0" />
+      <ComboBox fx:id="choice_phasenname" layoutX="12.0" layoutY="323.0" prefHeight="25.0" prefWidth="140.0" />
    </children>
 </AnchorPane>

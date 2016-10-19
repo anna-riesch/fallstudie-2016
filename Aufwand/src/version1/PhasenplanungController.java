@@ -10,14 +10,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import Tabellen.Phasen;
 import Tabellen.Projektphasen;
 import Tabellen.Wert;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -27,7 +25,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
 
 public class PhasenplanungController {
 	@FXML
@@ -43,13 +40,11 @@ public class PhasenplanungController {
 	@FXML
 	private TableColumn<Projektphasen, String> tblCell_enddatum;
 	@FXML
-	private ComboBox<String> choice_phasenname;
+	private ComboBox<String> choice_phasenname = new ComboBox<String>();
 	@FXML
 	private TextField text_pt;
 	@FXML
 	private TextField text_rz;
-	@FXML
-	private TextField text_phasenname;
 	@FXML
 	private Button button_phase_anlegen;
 	@FXML
@@ -76,8 +71,7 @@ public class PhasenplanungController {
 	private TableColumn<Wert, Double> tblCell_kompk;
 
 	private ObservableList<Projektphasen> ppData;
-	private ObservableList<Phasen> pData;
-	private ObservableList<String> pDataString;
+	private ObservableList<String> pData;
 	private ObservableList<Wert> wData;
 
 	private schnittstelle db;
@@ -97,22 +91,25 @@ public class PhasenplanungController {
 
 		db = new schnittstelle();
 
-		this.phase_aktualisieren();
+		ppData = FXCollections.observableArrayList(db.projektphasen_laden(projektid));
 
-		tbl_phasenTabelle.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-				try {
+		tblCell_phasenID.setCellValueFactory(cellData -> cellData.getValue().getprojektphasenIDProperty().asObject());
+		tblCell_phasenname.setCellValueFactory(cellData -> cellData.getValue().getphasennameProperty());
+		tblCell_startdatum.setCellValueFactory(cellData -> cellData.getValue().getstartdatumProperty());
+		tblCell_enddatum.setCellValueFactory(cellData -> cellData.getValue().getenddatumProperty());
 
-					System.out.println("tbl_phasenTabelle_action");
+		tbl_phasenTabelle.setItems(ppData);
 
-					phase_geklickt(tbl_phasenTabelle.getSelectionModel().getSelectedItem());
+		tbl_phasenTabelle.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			try {
 
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				System.out.println("tbl_phasenTabelle_action");
 
+				phase_geklickt(tbl_phasenTabelle.getSelectionModel().getSelectedItem());
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		});
 
@@ -124,35 +121,19 @@ public class PhasenplanungController {
 		 * e.printStackTrace(); } });
 		 */
 
-		tbl_kompetenzTabelle.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-				try {
-
-					System.out.println("tbl_kompetenzTabelle_action");
-
-					tbl_kompetenzTabelle_geklickt(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem());
-
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
-		});
-
-	}
-
-	public void phase_aktualisieren() throws SQLException {
-		System.out.println("phase_aktualisieren");
-		ppData = FXCollections.observableArrayList(db.projektphasen_laden(projektid));
-		tblCell_phasenID.setCellValueFactory(cellData -> cellData.getValue().getprojektphasenIDProperty().asObject());
-		tblCell_phasenname.setCellValueFactory(cellData -> cellData.getValue().getphasennameProperty());
-		tblCell_startdatum.setCellValueFactory(cellData -> cellData.getValue().getstartdatumProperty());
-		tblCell_enddatum.setCellValueFactory(cellData -> cellData.getValue().getenddatumProperty());
-
-		tbl_phasenTabelle.setItems(ppData);
-
+		tbl_kompetenzTabelle.getSelectionModel().selectedItemProperty()
+				.addListener((observable, oldValue, newValue) -> {
+					try {
+						System.out.println("tbl_kompetenzTabelle_action");
+						if (geklickt == true) {
+							tbl_kompetenzTabelle_geklickt(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem());
+						}
+						geklickt = true;
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
 	}
 
 	@FXML
@@ -170,11 +151,6 @@ public class PhasenplanungController {
 		tblCell_kompk.setCellValueFactory(cellData -> cellData.getValue().getwertProperty().asObject());
 
 		tbl_kompetenzTabelle.setItems(wData);
-
-		text_phasenname.setText(p.getphasenname());
-		// pDataString = db.phasen_laden();
-		// choice_phasenname.setItems(pDataString);
-		// choice_phasenname.setValue(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getphasenname());
 
 		// this.kompetenzen_aktualisieren(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID());
 
@@ -205,34 +181,19 @@ public class PhasenplanungController {
 
 	}
 
-	public void choice_phasenname_auswahl() throws SQLException {
+	@FXML
+	public void choice_phasenname_auswahl(String phasenname) throws SQLException {
 		System.out.println("choice_phasenname_auswahl");
+		if (phasenname != null
+				&& phasenname != tbl_phasenTabelle.getSelectionModel().getSelectedItem().getphasenname()) {
+			System.out.println(choice_phasenname.getValue());
+			System.out.println("ES WIRD EIN PHASENNAME GEÄNDERT");
+			int anzahl = db.phasenname_aendern(
+					tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID(), phasenname);
+			System.out.println(phasenname + anzahl);
+			geklickt = false;
 
-		if (geklickt == true) {
-			if (!choice_phasenname.getValue().toString()
-					.equals(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getphasenname().toString())
-					&& !choice_phasenname.getValue().toString().equals(null)) {
-				System.out.println("JETZT ÄNDERN");
-
-			} else {
-				System.out.println("JETZT NICHT ÄNDERN");
-			}
 		}
-		geklickt = true;
-
-		// if (phasenname != null
-		// && phasenname !=
-		// tbl_phasenTabelle.getSelectionModel().getSelectedItem().getphasenname())
-		// {
-		// System.out.println(choice_phasenname.getValue());
-		// System.out.println("ES WIRD EIN PHASENNAME GEÄNDERT");
-		// int anzahl = db.phasenname_aendern(
-		// tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID(),
-		// phasenname);
-		// System.out.println(phasenname + anzahl);
-		// geklickt = false;
-		//
-		// }
 
 	}
 
@@ -257,7 +218,7 @@ public class PhasenplanungController {
 		// tbl_phasenTabelle.getFocusModel().focus(pos);
 		// }
 		// });
-		// test
+
 		tbl_phasenTabelle.setItems(ppData);
 
 	}
@@ -370,27 +331,7 @@ public class PhasenplanungController {
 		// wData = FXCollections.observableArrayList(db.werte_laden(projektid));
 		// tbl_kompetenzTabelle.setItems(wData);
 		System.out.println("WIE VIELE GIBTS GRAD?" + tbl_phasenTabelle.getItems().size());
-		int pos = tbl_phasenTabelle.getItems().size();
-		this.phase_aktualisieren();
-		tbl_phasenTabelle.requestFocus();
-		tbl_phasenTabelle.getSelectionModel().select(pos);
-		// this.kompetenzen_aktualisieren(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID());
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					phase_geklickt(tbl_phasenTabelle.getSelectionModel().getSelectedItem());
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-
-		// wData.clear();
-		text_phasenname.setText("");
-		geklickt = false;
-		// pDataString.clear();
+		this.phasen_aktualisieren(tbl_phasenTabelle.getItems().size());
 
 	}
 
@@ -404,11 +345,16 @@ public class PhasenplanungController {
 		System.out.println(tbl_phasenTabelle.getItems().size());
 		tbl_phasenTabelle.requestFocus();
 		geklickt = false;
-		this.phase_aktualisieren();
-		wData.clear();
-		text_phasenname.setText("");
+		tbl_phasenTabelle.getSelectionModel().select(tbl_phasenTabelle.getItems().size() - 2);
+		ppData = FXCollections.observableArrayList(db.projektphasen_laden(projektid));
+		tblCell_phasenID.setCellValueFactory(cellData -> cellData.getValue().getprojektphasenIDProperty().asObject());
+		tblCell_phasenname.setCellValueFactory(cellData -> cellData.getValue().getphasennameProperty());
+		tblCell_startdatum.setCellValueFactory(cellData -> cellData.getValue().getstartdatumProperty());
+		tblCell_enddatum.setCellValueFactory(cellData -> cellData.getValue().getenddatumProperty());
 		geklickt = false;
-		pDataString.clear();
+		tbl_phasenTabelle.setItems(ppData);
+		tbl_phasenTabelle.requestFocus();
+		tbl_phasenTabelle.getSelectionModel().select(tbl_phasenTabelle.getItems().size() - 1);
 
 		// this.phasen_aktualisieren(tbl_phasenTabelle.getItems().size() - 2);
 
@@ -462,20 +408,4 @@ public class PhasenplanungController {
 
 	}
 
-	@FXML
-	public void phasenname_uebernehmen(ActionEvent event) throws SQLException {
-		System.out.println("phasenname_uebernehmen");
-		int anzahl = db.phasenname_aendern(text_phasenname.getText(),
-				tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID());
-		int pos = tbl_phasenTabelle.getSelectionModel().getSelectedIndex();
-		this.phase_aktualisieren();
-		tbl_phasenTabelle.requestFocus();
-		tbl_phasenTabelle.getSelectionModel().select(pos);
-		// pDataString = db.phasen_laden();
-		// choice_phasenname.setItems(pDataString);
-		// tbl_phasenTabelle.getSelectionModel().select(tbl_phasenTabelle.getItems().size()
-		// - 1);
-		// choice_phasenname.setValue(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getphasenname());
-
-	}
 }

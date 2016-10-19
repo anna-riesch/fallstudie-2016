@@ -1,13 +1,11 @@
 package version1;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import Tabellen.Kompetenz;
@@ -16,8 +14,6 @@ import Tabellen.Projekt;
 import Tabellen.Projektkompetenz;
 import Tabellen.Projektphasen;
 import Tabellen.Wert;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 public class schnittstelle {
 
@@ -159,10 +155,9 @@ public class schnittstelle {
 		int anzahl = 0;
 
 		try {
-			Calendar currenttime = Calendar.getInstance();
-			Date sqldate = new Date((currenttime.getTime()).getTime());
-			stmt.executeUpdate("insert into Projektphase (ProjektID, Startdatum, Enddatum, Name) values (" + pid + ",'"
-					+ sqldate + "', '" + sqldate + "', '')");
+
+			stmt.executeUpdate("insert into Projektphase (ProjektID, PhasenID, Startdatum, Enddatum) values (" + pid
+					+ ", 1, '2016-01-01', '2016-01-01')");
 			rs = stmt
 					.executeQuery("select max(ProjektphasenID) as neueppid from Projektphase where ProjektID = " + pid);
 			rs.next();
@@ -317,8 +312,8 @@ public class schnittstelle {
 
 		try {
 			rs = stmt.executeQuery(
-					"select ProjektphasenID, Name, Startdatum, Enddatum from Projektphase where ProjektID = " + pid
-							+ " ORDER BY ProjektphasenID ASC");
+					"select Projektphase.ProjektphasenID, Phase.Name, Projektphase.Startdatum, Projektphase.Enddatum from Projektphase inner join Phase on Phase.PhasenID = Projektphase.PhasenID where Projektphase.ProjektID = "
+							+ pid + " ORDER BY Projektphase.ProjektphasenID ASC");
 			while (rs.next()) {
 				projektphasen.add(new Projektphasen(rs.getInt("ProjektphasenID"), rs.getString("Name"),
 						rs.getString("Startdatum"), rs.getString("Enddatum")));
@@ -330,52 +325,19 @@ public class schnittstelle {
 
 	}
 
-	public ObservableList<String> phasen_laden() throws SQLException {
+	public List<String> phasen_laden() throws SQLException {
 
-		ObservableList<String> phasen = FXCollections.observableArrayList();
+		List<String> phasen = new ArrayList<String>();
 
 		try {
 			rs = stmt.executeQuery("select * from Phase order by Name ASC");
 			while (rs.next()) {
-				phasen.add(rs.getString("Name"));
+				phasen.add(new String(rs.getString("Name")));
 			}
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
 		}
 		return phasen;
-
-	}
-
-	public int phase_anlegen(String neu, int phid) throws SQLException {
-
-		int anzahl = 0;
-		try {
-
-			anzahl = stmt.executeUpdate("insert into Phase (Name) values ('" + neu + "')");
-			rs = stmt.executeQuery("select max(PhasenID) as neuepid from Phase");
-			rs.next();
-			int neuepid = rs.getInt("neuepid");
-			anzahl = stmt.executeUpdate(
-					"UPDATE Projektphase set PhasenID = " + neuepid + " where ProjektphasenID = " + phid);
-
-		} catch (SQLException e) {
-			System.out.println("Fehler: " + e);
-		}
-		return anzahl;
-
-	}
-
-	public int phasenname_aendern(String neu, int phid) throws SQLException {
-
-		int anzahl = 0;
-		try {
-
-			anzahl = stmt.executeUpdate("UPDATE Projektphase set Name = '" + neu + "' where ProjektphasenID = " + phid);
-
-		} catch (SQLException e) {
-			System.out.println("Fehler: " + e);
-		}
-		return anzahl;
 
 	}
 
