@@ -1,7 +1,5 @@
 package version1;
 
-import static java.lang.Math.toIntExact;
-
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -76,7 +74,8 @@ public class PhasenplanungController {
 	@FXML
 	private TableColumn<Wert, Integer> tblCell_komppt;
 	@FXML
-	private TableColumn<Wert, Integer> tblCell_auslastung;
+	private TableColumn<Wert, Integer> tblCell_puffer;
+
 	@FXML
 	private TableColumn<Wert, Double> tblCell_kompk;
 
@@ -173,7 +172,8 @@ public class PhasenplanungController {
 		tblCell_zugehoerigkeit.setCellValueFactory(cellData -> cellData.getValue().getzugehoerigkeitProperty());
 		tblCell_komprisiko.setCellValueFactory(cellData -> cellData.getValue().getrisikozuschlagProperty().asObject());
 		tblCell_komppt.setCellValueFactory(cellData -> cellData.getValue().getpersonentageProperty().asObject());
-		tblCell_auslastung.setCellValueFactory(cellData -> cellData.getValue().getauslastungProperty().asObject());
+		tblCell_puffer.setCellValueFactory(cellData -> cellData.getValue().getpufferProperty().asObject());
+
 		tblCell_kompk.setCellValueFactory(cellData -> cellData.getValue().getwertProperty().asObject());
 
 		tbl_kompetenzTabelle.setItems(wData);
@@ -325,7 +325,8 @@ public class PhasenplanungController {
 		tblCell_kompname.setCellValueFactory(cellData -> cellData.getValue().getkompetenznameProperty());
 		tblCell_komprisiko.setCellValueFactory(cellData -> cellData.getValue().getrisikozuschlagProperty().asObject());
 		tblCell_komppt.setCellValueFactory(cellData -> cellData.getValue().getpersonentageProperty().asObject());
-		tblCell_auslastung.setCellValueFactory(cellData -> cellData.getValue().getauslastungProperty().asObject());
+
+		tblCell_puffer.setCellValueFactory(cellData -> cellData.getValue().getpufferProperty().asObject());
 		tblCell_kompk.setCellValueFactory(cellData -> cellData.getValue().getwertProperty().asObject());
 		geklickt = false;
 		tbl_kompetenzTabelle.setItems(wData);
@@ -449,19 +450,22 @@ public class PhasenplanungController {
 		Date b = format.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getenddatum());
 		Date d;
 
-		// Differenz zwischen Start- und Enddatum berechnen
+		// Differenz zwischen Start- und Enddatum berechnen und Wochenend-Tage
+		// abziehen
 		long diff = b.getTime() - a.getTime();
 		long tage = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-		int auslastung = tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getauslastung();
-		int tageint = toIntExact(tage);
 
-		// Differenz mit Auslastung verrechnen und in String konvertieren
-		double tagedouble = (double) tageint;
-		double auslastungdouble = (double) auslastung;
-		double auslastungprozent = auslastungdouble / 100;
-		double ptneudouble = auslastungprozent * tagedouble;
-		int ptneuint = (int) ptneudouble;
-		String ptneu = String.valueOf(ptneuint);
+		long wochen = tage / 7;
+		double taged = (double) tage;
+		double wochend = (double) wochen;
+		taged = wochend * 4.25;
+		System.out.println(taged);
+		int tageint = (int) taged;
+		// int tageint = toIntExact(taged);
+		// int wochen = tageint / 7;
+
+		// in String konvertieren
+		String ptneu = String.valueOf(tageint);
 
 		// Neuer Personentag-Wert in Datenbank einfügen
 		db.personentage_aendern(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getwertid(), ptneu);
