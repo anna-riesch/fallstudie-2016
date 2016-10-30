@@ -17,9 +17,10 @@ public class Wert {
 	private DoubleProperty wert;
 	private StringProperty mitarbeitername;
 	private StringProperty zugehoerigkeit;
+	private IntegerProperty puffer;
 
 	public Wert(int wertid, String kompetenzname, int risikozuschlag, int personentage, int auslastung, double wert,
-			String mitarbeitername, String zugehoerigkeit) {
+			String mitarbeitername, String zugehoerigkeit, int puffer) {
 
 		this.setwertid(wertid);
 		this.setkompetenzname(kompetenzname);
@@ -29,6 +30,7 @@ public class Wert {
 		this.setwert(wert);
 		this.setmitarbeitername(mitarbeitername);
 		this.setzugehoerigkeit(zugehoerigkeit);
+		this.setpuffer(puffer);
 
 	}
 
@@ -42,6 +44,18 @@ public class Wert {
 
 	public void setwertid(int wertid) {
 		this.wertid = new SimpleIntegerProperty(wertid);
+	}
+
+	public int getpuffer() {
+		return puffer.get();
+	}
+
+	public IntegerProperty getpufferProperty() {
+		return puffer;
+	}
+
+	public void setpuffer(int puffer) {
+		this.puffer = new SimpleIntegerProperty(puffer);
 	}
 
 	public String getkompetenzname() {
