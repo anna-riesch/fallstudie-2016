@@ -352,12 +352,22 @@ public class PhasenplanungController {
 	}
 
 	@FXML
-	public void werte_uebernehmen(ActionEvent event) throws SQLException {
+	public void werte_uebernehmen(ActionEvent event) throws SQLException, ParseException {
 		System.out.println("werte_uebernehmen");
 		geklickt = false;
 		int pos = tbl_kompetenzTabelle.getSelectionModel().getSelectedIndex();
+
+		// HIER MUSS EXTERNE PUFFER REIN
+		int puffer = 0;
+
+		if (tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getzugehoerigkeit().equals("extern")) {
+			int ptgesamt = pt_berechnen();
+			int eingabe = Integer.parseInt(text_pt.getText());
+			puffer = ptgesamt - eingabe;
+		}
+
 		db.personentage_aendern(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getwertid(),
-				text_pt.getText());
+				text_pt.getText(), puffer);
 
 		Platform.runLater(new Runnable() {
 			@Override
@@ -443,6 +453,35 @@ public class PhasenplanungController {
 		// Aktuelle Position abrufen
 		int pos = tbl_kompetenzTabelle.getSelectionModel().getSelectedIndex();
 
+		// int tageint = toIntExact(taged);
+		// int wochen = tageint / 7;
+
+		int tageint = pt_berechnen();
+
+		// in String konvertieren
+		String ptneu = String.valueOf(tageint);
+
+		// Neuer Personentag-Wert in Datenbank einfügen
+		db.personentage_aendern(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getwertid(), ptneu, 0);
+
+		// GUI aktualisieren
+		geklickt = false;
+		int test = tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID();
+		this.kompetenzen_aktualisieren(test);
+		text_pt.setText(ptneu);
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				tbl_kompetenzTabelle.requestFocus();
+				tbl_kompetenzTabelle.getSelectionModel().select(pos);
+				// tbl_phasenTabelle.getFocusModel().focus(pos);
+			}
+		});
+
+	}
+
+	public int pt_berechnen() throws ParseException {
+
 		// Datums-Formater deklarieren
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 		System.out.println(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getstartdatum());
@@ -461,28 +500,8 @@ public class PhasenplanungController {
 		taged = wochend * 4.25;
 		System.out.println(taged);
 		int tageint = (int) taged;
-		// int tageint = toIntExact(taged);
-		// int wochen = tageint / 7;
 
-		// in String konvertieren
-		String ptneu = String.valueOf(tageint);
-
-		// Neuer Personentag-Wert in Datenbank einfügen
-		db.personentage_aendern(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getwertid(), ptneu);
-
-		// GUI aktualisieren
-		geklickt = false;
-		int test = tbl_phasenTabelle.getSelectionModel().getSelectedItem().getprojektphasenID();
-		this.kompetenzen_aktualisieren(test);
-		text_pt.setText(ptneu);
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				tbl_kompetenzTabelle.requestFocus();
-				tbl_kompetenzTabelle.getSelectionModel().select(pos);
-				// tbl_phasenTabelle.getFocusModel().focus(pos);
-			}
-		});
+		return tageint;
 
 	}
 

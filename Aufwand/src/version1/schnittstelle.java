@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import Tabellen.Bericht;
 import Tabellen.Kompetenz;
 import Tabellen.Mitarbeiterkompetenz;
 import Tabellen.Projekt;
@@ -112,12 +113,13 @@ public class schnittstelle {
 		return anzahl;
 	}
 
-	public int personentage_aendern(int wid, String neu) throws SQLException {
+	public int personentage_aendern(int wid, String neu, int puffer) throws SQLException {
 
 		int anzahl = 0;
 		try {
 
-			anzahl = stmt.executeUpdate("update Wert set Personentage = '" + neu + "' where WertID = " + wid);
+			anzahl = stmt.executeUpdate(
+					"update Wert set Personentage = " + neu + ", Puffer = " + puffer + " where WertID = " + wid);
 
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
@@ -441,6 +443,102 @@ public class schnittstelle {
 			System.out.println("Fehler: " + e);
 		}
 		return werte;
+
+	}
+
+	public List<Bericht> bericht_laden(int pid) throws SQLException {
+
+		List<Bericht> bericht = new ArrayList<Bericht>();
+		try {
+			rs = stmt.executeQuery(
+					"select Wert.WertID, Projektphase.ProjektphasenID, Projektphase.Name as 'pname', Projektkompetenz.KompetenzID, Kompetenz.Name, (Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))) as 'aufwand', Mitarbeiter.Kosten_pro_PT, Wert.Personentage, Projektkompetenz.Auslastung, Wert.Risikozuschlag, Projektphase.Startdatum, Projektphase.Enddatum from Wert inner join Projektphase on Projektphase.ProjektphasenID = Wert.ProjektphasenID inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Projektkompetenz.ProjektID = "
+							+ pid + " order by ProjektphasenID, WertID ASC");
+			while (rs.next()) {
+				bericht.add(new Bericht(rs.getInt("ProjektphasenID"), rs.getString("pname"), rs.getInt("KompetenzID"),
+						rs.getString("Name"), rs.getLong("aufwand"), rs.getBigDecimal("Kosten_pro_PT"),
+						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getInt("Risikozuschlag"),
+						rs.getString("startdatum"), rs.getString("enddatum")));
+				System.out.println(rs.getLong("aufwand"));
+			}
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return bericht;
+
+	}
+
+	public List<Bericht> bericht_laden_ohne(int pid) throws SQLException {
+
+		List<Bericht> bericht = new ArrayList<Bericht>();
+		try {
+			rs = stmt.executeQuery(
+					"select Wert.WertID, Projektphase.ProjektphasenID, Projektphase.Name as 'pname', Projektkompetenz.KompetenzID, Kompetenz.Name, (Wert.Personentage*(Projektkompetenz.Auslastung/100)) as 'aufwand', Mitarbeiter.Kosten_pro_PT, Wert.Personentage, Projektkompetenz.Auslastung, Wert.Risikozuschlag, Projektphase.Startdatum, Projektphase.Enddatum from Wert inner join Projektphase on Projektphase.ProjektphasenID = Wert.ProjektphasenID inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Projektkompetenz.ProjektID = "
+							+ pid + " order by ProjektphasenID, WertID ASC");
+			while (rs.next()) {
+				bericht.add(new Bericht(rs.getInt("ProjektphasenID"), rs.getString("pname"), rs.getInt("KompetenzID"),
+						rs.getString("Name"), rs.getLong("aufwand"), rs.getBigDecimal("Kosten_pro_PT"),
+						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getInt("Risikozuschlag"),
+						rs.getString("startdatum"), rs.getString("enddatum")));
+				System.out.println(rs.getLong("aufwand"));
+			}
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return bericht;
+
+	}
+
+	// public List<Bericht> bericht_laden2(int pid) throws SQLException {
+	//
+	// List<Bericht> bericht = new ArrayList<Bericht>();
+	// try {
+	// rs = stmt.executeQuery(
+	// "select Kompetenz.Name,
+	// SUM((Mitarbeiter.Kosten_pro_PT*Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))))
+	// as 'betrag', MIN(Projektphase.Startdatum) as startdatum,
+	// MAX(Projektphase.Enddatum) as enddatum from Wert inner join Projektphase
+	// on Projektphase.ProjektphasenID = Wert.ProjektphasenID inner join
+	// (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter
+	// on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on
+	// Projektkompetenz.MitarbeiterkompetenzID =
+	// Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on
+	// Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on
+	// Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where
+	// Projektkompetenz.ProjektID = "
+	// + pid + " group by Name");
+	// while (rs.next()) {
+	// bericht.add(new Bericht(rs.getLong("betrag"), rs.getString("Name"),
+	// rs.getString("startdatum"),
+	// rs.getString("enddatum")));
+	// }
+	// } catch (SQLException e) {
+	// System.out.println("Fehler: " + e);
+	// }
+	//
+	// return bericht;
+	//
+	// }
+
+	public String[] start_enddatum_laden(int pid) throws SQLException {
+
+		String[] datum = new String[2];
+
+		try {
+
+			rs = stmt.executeQuery(
+					"select min(startdatum) as 'startdatum', max(enddatum) as 'enddatum' from Projektphase where ProjektID = "
+							+ pid);
+			rs.next();
+			datum[0] = rs.getString("startdatum");
+			datum[1] = rs.getString("enddatum");
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return datum;
 
 	}
 
