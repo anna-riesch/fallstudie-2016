@@ -1,5 +1,7 @@
 package version1;
 
+import static java.lang.Math.toIntExact;
+
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -74,8 +76,7 @@ public class PhasenplanungController {
 	@FXML
 	private TableColumn<Wert, Integer> tblCell_komppt;
 	@FXML
-	private TableColumn<Wert, Integer> tblCell_puffer;
-
+	private TableColumn<Wert, Integer> tblCell_auslastung;
 	@FXML
 	private TableColumn<Wert, Double> tblCell_kompk;
 
@@ -172,8 +173,7 @@ public class PhasenplanungController {
 		tblCell_zugehoerigkeit.setCellValueFactory(cellData -> cellData.getValue().getzugehoerigkeitProperty());
 		tblCell_komprisiko.setCellValueFactory(cellData -> cellData.getValue().getrisikozuschlagProperty().asObject());
 		tblCell_komppt.setCellValueFactory(cellData -> cellData.getValue().getpersonentageProperty().asObject());
-		tblCell_puffer.setCellValueFactory(cellData -> cellData.getValue().getpufferProperty().asObject());
-
+		tblCell_auslastung.setCellValueFactory(cellData -> cellData.getValue().getauslastungProperty().asObject());
 		tblCell_kompk.setCellValueFactory(cellData -> cellData.getValue().getwertProperty().asObject());
 
 		tbl_kompetenzTabelle.setItems(wData);
@@ -325,8 +325,7 @@ public class PhasenplanungController {
 		tblCell_kompname.setCellValueFactory(cellData -> cellData.getValue().getkompetenznameProperty());
 		tblCell_komprisiko.setCellValueFactory(cellData -> cellData.getValue().getrisikozuschlagProperty().asObject());
 		tblCell_komppt.setCellValueFactory(cellData -> cellData.getValue().getpersonentageProperty().asObject());
-
-		tblCell_puffer.setCellValueFactory(cellData -> cellData.getValue().getpufferProperty().asObject());
+		tblCell_auslastung.setCellValueFactory(cellData -> cellData.getValue().getauslastungProperty().asObject());
 		tblCell_kompk.setCellValueFactory(cellData -> cellData.getValue().getwertProperty().asObject());
 		geklickt = false;
 		tbl_kompetenzTabelle.setItems(wData);
@@ -352,22 +351,12 @@ public class PhasenplanungController {
 	}
 
 	@FXML
-	public void werte_uebernehmen(ActionEvent event) throws SQLException, ParseException {
+	public void werte_uebernehmen(ActionEvent event) throws SQLException {
 		System.out.println("werte_uebernehmen");
 		geklickt = false;
 		int pos = tbl_kompetenzTabelle.getSelectionModel().getSelectedIndex();
-
-		// HIER MUSS EXTERNE PUFFER REIN
-		int puffer = 0;
-
-		if (tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getzugehoerigkeit().equals("extern")) {
-			int ptgesamt = pt_berechnen();
-			int eingabe = Integer.parseInt(text_pt.getText());
-			puffer = ptgesamt - eingabe;
-		}
-
 		db.personentage_aendern(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getwertid(),
-				text_pt.getText(), puffer);
+				text_pt.getText());
 
 		Platform.runLater(new Runnable() {
 			@Override
@@ -453,16 +442,29 @@ public class PhasenplanungController {
 		// Aktuelle Position abrufen
 		int pos = tbl_kompetenzTabelle.getSelectionModel().getSelectedIndex();
 
-		// int tageint = toIntExact(taged);
-		// int wochen = tageint / 7;
+		// Datums-Formater deklarieren
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		System.out.println(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getstartdatum());
+		Date a = format.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getstartdatum());
+		Date b = format.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getenddatum());
+		Date d;
 
-		int tageint = pt_berechnen();
+		// Differenz zwischen Start- und Enddatum berechnen
+		long diff = b.getTime() - a.getTime();
+		long tage = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+		int auslastung = tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getauslastung();
+		int tageint = toIntExact(tage);
 
-		// in String konvertieren
-		String ptneu = String.valueOf(tageint);
+		// Differenz mit Auslastung verrechnen und in String konvertieren
+		double tagedouble = (double) tageint;
+		double auslastungdouble = (double) auslastung;
+		double auslastungprozent = auslastungdouble / 100;
+		double ptneudouble = auslastungprozent * tagedouble;
+		int ptneuint = (int) ptneudouble;
+		String ptneu = String.valueOf(ptneuint);
 
 		// Neuer Personentag-Wert in Datenbank einfügen
-		db.personentage_aendern(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getwertid(), ptneu, 0);
+		db.personentage_aendern(tbl_kompetenzTabelle.getSelectionModel().getSelectedItem().getwertid(), ptneu);
 
 		// GUI aktualisieren
 		geklickt = false;
@@ -477,31 +479,6 @@ public class PhasenplanungController {
 				// tbl_phasenTabelle.getFocusModel().focus(pos);
 			}
 		});
-
-	}
-
-	public int pt_berechnen() throws ParseException {
-
-		// Datums-Formater deklarieren
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-		System.out.println(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getstartdatum());
-		Date a = format.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getstartdatum());
-		Date b = format.parse(tbl_phasenTabelle.getSelectionModel().getSelectedItem().getenddatum());
-		Date d;
-
-		// Differenz zwischen Start- und Enddatum berechnen und Wochenend-Tage
-		// abziehen
-		long diff = b.getTime() - a.getTime();
-		long tage = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-
-		long wochen = tage / 7;
-		double taged = (double) tage;
-		double wochend = (double) wochen;
-		taged = wochend * 4.25;
-		System.out.println(taged);
-		int tageint = (int) taged;
-
-		return tageint;
 
 	}
 
