@@ -82,7 +82,7 @@ public class KompetenzenController {
 					}
 				});
 
-		// this.projektkompetenz_aktualisieren();
+		projektkompetenz_aktualisieren();
 
 	}
 

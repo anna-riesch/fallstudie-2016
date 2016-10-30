@@ -1,19 +1,24 @@
 package version1;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import Tabellen.Bericht;
 import Tabellen.Kompetenz;
 import Tabellen.Mitarbeiterkompetenz;
 import Tabellen.Projekt;
 import Tabellen.Projektkompetenz;
 import Tabellen.Projektphasen;
 import Tabellen.Wert;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class schnittstelle {
 
@@ -36,7 +41,7 @@ public class schnittstelle {
 		try // Connection zur Datenbank aufbauen
 		{
 			con = DriverManager.getConnection("jdbc:mysql://lolstats.org:3306/fallstudie_2016", "fallstudie_user2",
-					"passwort123!");
+					"sSsx36&8");
 			System.out.println("Connection zur Datenbank aufgebaut\n--------------------------------");
 		} // try
 		catch (SQLException e) {
@@ -108,12 +113,13 @@ public class schnittstelle {
 		return anzahl;
 	}
 
-	public int personentage_aendern(int wid, String neu) throws SQLException {
+	public int personentage_aendern(int wid, String neu, int puffer) throws SQLException {
 
 		int anzahl = 0;
 		try {
 
-			anzahl = stmt.executeUpdate("update Wert set Personentage = '" + neu + "' where WertID = " + wid);
+			anzahl = stmt.executeUpdate(
+					"update Wert set Personentage = " + neu + ", Puffer = " + puffer + " where WertID = " + wid);
 
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
@@ -155,9 +161,10 @@ public class schnittstelle {
 		int anzahl = 0;
 
 		try {
-
-			stmt.executeUpdate("insert into Projektphase (ProjektID, PhasenID, Startdatum, Enddatum) values (" + pid
-					+ ", 1, '2016-01-01', '2016-01-01')");
+			Calendar currenttime = Calendar.getInstance();
+			Date sqldate = new Date((currenttime.getTime()).getTime());
+			stmt.executeUpdate("insert into Projektphase (ProjektID, Startdatum, Enddatum, Name) values (" + pid + ",'"
+					+ sqldate + "', '" + sqldate + "', '')");
 			rs = stmt
 					.executeQuery("select max(ProjektphasenID) as neueppid from Projektphase where ProjektID = " + pid);
 			rs.next();
@@ -312,8 +319,8 @@ public class schnittstelle {
 
 		try {
 			rs = stmt.executeQuery(
-					"select Projektphase.ProjektphasenID, Phase.Name, Projektphase.Startdatum, Projektphase.Enddatum from Projektphase inner join Phase on Phase.PhasenID = Projektphase.PhasenID where Projektphase.ProjektID = "
-							+ pid + " ORDER BY Projektphase.ProjektphasenID ASC");
+					"select ProjektphasenID, Name, Startdatum, Enddatum from Projektphase where ProjektID = " + pid
+							+ " ORDER BY ProjektphasenID ASC");
 			while (rs.next()) {
 				projektphasen.add(new Projektphasen(rs.getInt("ProjektphasenID"), rs.getString("Name"),
 						rs.getString("Startdatum"), rs.getString("Enddatum")));
@@ -325,19 +332,52 @@ public class schnittstelle {
 
 	}
 
-	public List<String> phasen_laden() throws SQLException {
+	public ObservableList<String> phasen_laden() throws SQLException {
 
-		List<String> phasen = new ArrayList<String>();
+		ObservableList<String> phasen = FXCollections.observableArrayList();
 
 		try {
 			rs = stmt.executeQuery("select * from Phase order by Name ASC");
 			while (rs.next()) {
-				phasen.add(new String(rs.getString("Name")));
+				phasen.add(rs.getString("Name"));
 			}
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
 		}
 		return phasen;
+
+	}
+
+	public int phase_anlegen(String neu, int phid) throws SQLException {
+
+		int anzahl = 0;
+		try {
+
+			anzahl = stmt.executeUpdate("insert into Phase (Name) values ('" + neu + "')");
+			rs = stmt.executeQuery("select max(PhasenID) as neuepid from Phase");
+			rs.next();
+			int neuepid = rs.getInt("neuepid");
+			anzahl = stmt.executeUpdate(
+					"UPDATE Projektphase set PhasenID = " + neuepid + " where ProjektphasenID = " + phid);
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return anzahl;
+
+	}
+
+	public int phasenname_aendern(String neu, int phid) throws SQLException {
+
+		int anzahl = 0;
+		try {
+
+			anzahl = stmt.executeUpdate("UPDATE Projektphase set Name = '" + neu + "' where ProjektphasenID = " + phid);
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+		return anzahl;
 
 	}
 
@@ -392,16 +432,113 @@ public class schnittstelle {
 
 		try {
 			rs = stmt.executeQuery(
-					"select Wert.WertID, Wert.Risikozuschlag, Wert.Personentage, Wert.Wert, Kompetenz.Name, Projektkompetenz.Auslastung, (Mitarbeiter.Kosten_pro_PT*Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))) as 'betrag' from Wert inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Wert.ProjektphasenID = "
-							+ phid);
+					"select Wert.WertID, Wert.Risikozuschlag, Wert.Puffer, Wert.Personentage, Wert.Wert, Kompetenz.Name, Projektkompetenz.Auslastung, (Mitarbeiter.Kosten_pro_PT*Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))) as 'betrag', Mitarbeiter.Name as MName, Mitarbeiter.Zugehoerigkeit from Wert inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Wert.ProjektphasenID = "
+							+ phid + " ORDER BY Kompetenz.Name ASC");
 			while (rs.next()) {
 				werte.add(new Wert(rs.getInt("WertID"), rs.getString("Name"), rs.getInt("Risikozuschlag"),
-						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getDouble("betrag")));
+						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getDouble("betrag"),
+						rs.getString("MName"), rs.getString("Zugehoerigkeit"), rs.getInt("Puffer")));
 			}
 		} catch (SQLException e) {
 			System.out.println("Fehler: " + e);
 		}
 		return werte;
+
+	}
+
+	public List<Bericht> bericht_laden(int pid) throws SQLException {
+
+		List<Bericht> bericht = new ArrayList<Bericht>();
+		try {
+			rs = stmt.executeQuery(
+					"select Wert.WertID, Projektphase.ProjektphasenID, Projektphase.Name as 'pname', Projektkompetenz.KompetenzID, Kompetenz.Name, (Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))) as 'aufwand', Mitarbeiter.Kosten_pro_PT, Wert.Personentage, Projektkompetenz.Auslastung, Wert.Risikozuschlag, Projektphase.Startdatum, Projektphase.Enddatum from Wert inner join Projektphase on Projektphase.ProjektphasenID = Wert.ProjektphasenID inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Projektkompetenz.ProjektID = "
+							+ pid + " order by ProjektphasenID, WertID ASC");
+			while (rs.next()) {
+				bericht.add(new Bericht(rs.getInt("ProjektphasenID"), rs.getString("pname"), rs.getInt("KompetenzID"),
+						rs.getString("Name"), rs.getLong("aufwand"), rs.getBigDecimal("Kosten_pro_PT"),
+						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getInt("Risikozuschlag"),
+						rs.getString("startdatum"), rs.getString("enddatum")));
+				System.out.println(rs.getLong("aufwand"));
+			}
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return bericht;
+
+	}
+
+	public List<Bericht> bericht_laden_ohne(int pid) throws SQLException {
+
+		List<Bericht> bericht = new ArrayList<Bericht>();
+		try {
+			rs = stmt.executeQuery(
+					"select Wert.WertID, Projektphase.ProjektphasenID, Projektphase.Name as 'pname', Projektkompetenz.KompetenzID, Kompetenz.Name, (Wert.Personentage*(Projektkompetenz.Auslastung/100)) as 'aufwand', Mitarbeiter.Kosten_pro_PT, Wert.Personentage, Projektkompetenz.Auslastung, Wert.Risikozuschlag, Projektphase.Startdatum, Projektphase.Enddatum from Wert inner join Projektphase on Projektphase.ProjektphasenID = Wert.ProjektphasenID inner join (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on Projektkompetenz.MitarbeiterkompetenzID = Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where Projektkompetenz.ProjektID = "
+							+ pid + " order by ProjektphasenID, WertID ASC");
+			while (rs.next()) {
+				bericht.add(new Bericht(rs.getInt("ProjektphasenID"), rs.getString("pname"), rs.getInt("KompetenzID"),
+						rs.getString("Name"), rs.getLong("aufwand"), rs.getBigDecimal("Kosten_pro_PT"),
+						rs.getInt("Personentage"), rs.getInt("Auslastung"), rs.getInt("Risikozuschlag"),
+						rs.getString("startdatum"), rs.getString("enddatum")));
+				System.out.println(rs.getLong("aufwand"));
+			}
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return bericht;
+
+	}
+
+	// public List<Bericht> bericht_laden2(int pid) throws SQLException {
+	//
+	// List<Bericht> bericht = new ArrayList<Bericht>();
+	// try {
+	// rs = stmt.executeQuery(
+	// "select Kompetenz.Name,
+	// SUM((Mitarbeiter.Kosten_pro_PT*Wert.Personentage*(Projektkompetenz.Auslastung/100)*(1+(Wert.Risikozuschlag/100))))
+	// as 'betrag', MIN(Projektphase.Startdatum) as startdatum,
+	// MAX(Projektphase.Enddatum) as enddatum from Wert inner join Projektphase
+	// on Projektphase.ProjektphasenID = Wert.ProjektphasenID inner join
+	// (Projektkompetenz inner join (Mitarbeiterkompetenz inner join Mitarbeiter
+	// on Mitarbeiter.MitarbeiterID = Mitarbeiterkompetenz.MitarbeiterID) on
+	// Projektkompetenz.MitarbeiterkompetenzID =
+	// Mitarbeiterkompetenz.MitarbeiterkompetenzID inner join Kompetenz on
+	// Kompetenz.KompetenzID = Projektkompetenz.KompetenzID) on
+	// Wert.ProjektkompetenzID = Projektkompetenz.ProjektkompetenzID where
+	// Projektkompetenz.ProjektID = "
+	// + pid + " group by Name");
+	// while (rs.next()) {
+	// bericht.add(new Bericht(rs.getLong("betrag"), rs.getString("Name"),
+	// rs.getString("startdatum"),
+	// rs.getString("enddatum")));
+	// }
+	// } catch (SQLException e) {
+	// System.out.println("Fehler: " + e);
+	// }
+	//
+	// return bericht;
+	//
+	// }
+
+	public String[] start_enddatum_laden(int pid) throws SQLException {
+
+		String[] datum = new String[2];
+
+		try {
+
+			rs = stmt.executeQuery(
+					"select min(startdatum) as 'startdatum', max(enddatum) as 'enddatum' from Projektphase where ProjektID = "
+							+ pid);
+			rs.next();
+			datum[0] = rs.getString("startdatum");
+			datum[1] = rs.getString("enddatum");
+
+		} catch (SQLException e) {
+			System.out.println("Fehler: " + e);
+		}
+
+		return datum;
 
 	}
 

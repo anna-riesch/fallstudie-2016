@@ -15,8 +15,12 @@ public class Wert {
 	private IntegerProperty personentage;
 	private IntegerProperty auslastung;
 	private DoubleProperty wert;
+	private StringProperty mitarbeitername;
+	private StringProperty zugehoerigkeit;
+	private IntegerProperty puffer;
 
-	public Wert(int wertid, String kompetenzname, int risikozuschlag, int personentage, int auslastung, double wert) {
+	public Wert(int wertid, String kompetenzname, int risikozuschlag, int personentage, int auslastung, double wert,
+			String mitarbeitername, String zugehoerigkeit, int puffer) {
 
 		this.setwertid(wertid);
 		this.setkompetenzname(kompetenzname);
@@ -24,6 +28,9 @@ public class Wert {
 		this.setpersonentage(personentage);
 		this.setauslastung(auslastung);
 		this.setwert(wert);
+		this.setmitarbeitername(mitarbeitername);
+		this.setzugehoerigkeit(zugehoerigkeit);
+		this.setpuffer(puffer);
 
 	}
 
@@ -39,6 +46,18 @@ public class Wert {
 		this.wertid = new SimpleIntegerProperty(wertid);
 	}
 
+	public int getpuffer() {
+		return puffer.get();
+	}
+
+	public IntegerProperty getpufferProperty() {
+		return puffer;
+	}
+
+	public void setpuffer(int puffer) {
+		this.puffer = new SimpleIntegerProperty(puffer);
+	}
+
 	public String getkompetenzname() {
 		return kompetenzname.get();
 	}
@@ -49,6 +68,30 @@ public class Wert {
 
 	public void setkompetenzname(String kompetenzname) {
 		this.kompetenzname = new SimpleStringProperty(kompetenzname);
+	}
+
+	public String getmitarbeitername() {
+		return mitarbeitername.get();
+	}
+
+	public StringProperty getmitarbeiternameProperty() {
+		return mitarbeitername;
+	}
+
+	public void setmitarbeitername(String mitarbeitername) {
+		this.mitarbeitername = new SimpleStringProperty(mitarbeitername);
+	}
+
+	public String getzugehoerigkeit() {
+		return zugehoerigkeit.get();
+	}
+
+	public StringProperty getzugehoerigkeitProperty() {
+		return zugehoerigkeit;
+	}
+
+	public void setzugehoerigkeit(String zugehoerigkeit) {
+		this.zugehoerigkeit = new SimpleStringProperty(zugehoerigkeit);
 	}
 
 	public int getrisikozuschlag() {

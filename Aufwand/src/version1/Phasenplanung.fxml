@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="421.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="version1.PhasenplanungController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="421.0" prefWidth="1149.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="version1.PhasenplanungController">
    <children>
       <Text layoutX="16.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Phasenplanung für das Projekt:" wrappingWidth="297.431640625">
          <font>
@@ -38,19 +38,22 @@
       <Text layoutX="353.0" layoutY="313.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Risikozuschlag" wrappingWidth="149.00000444054604" />
       <Button fx:id="button_phase_anlegen" layoutX="15.0" layoutY="54.0" mnemonicParsing="false" onAction="#button_phase_anlegen_click" text="Phase hinzufügen" />
       <Button fx:id="button_phase_loeschen" layoutX="136.0" layoutY="54.0" mnemonicParsing="false" onAction="#button_phase_loeschen_click" text="Phase löschen" />
-      <DatePicker fx:id="datum_start" layoutX="13.0" layoutY="380.0" prefHeight="25.0" prefWidth="100.0" />
+      <DatePicker fx:id="datum_start" layoutX="13.0" layoutY="380.0" onAction="#datum_start_geklickt" prefHeight="25.0" prefWidth="100.0" />
       <DatePicker fx:id="datum_ende" layoutX="130.0" layoutY="380.0" onAction="#datum_ende_geklickt" prefHeight="25.0" prefWidth="100.0" />
       <Button fx:id="button_pt_berechnen" layoutX="577.0" layoutY="323.0" mnemonicParsing="false" onAction="#button_pt_berechnen_click" text="Personentage berechnen" />
-      <TableView fx:id="tbl_kompetenzTabelle" layoutX="353.0" layoutY="95.0" prefHeight="200.0" prefWidth="466.0">
+      <TableView fx:id="tbl_kompetenzTabelle" layoutX="353.0" layoutY="95.0" prefHeight="200.0" prefWidth="774.0">
          <columns>
             <TableColumn fx:id="tblCell_kompID" prefWidth="33.0" text="ID" />
             <TableColumn fx:id="tblCell_kompname" prefWidth="95.0" text="Kompetenzen" />
+            <TableColumn fx:id="tblCell_mitarbeitername" prefWidth="75.0" text="Mitarbeiter" />
+            <TableColumn fx:id="tblCell_zugehoerigkeit" prefWidth="75.0" text="Int/Ext" />
             <TableColumn fx:id="tblCell_komprisiko" prefWidth="97.0" text="Risikozuschlag" />
             <TableColumn fx:id="tblCell_komppt" prefWidth="86.0" text="Personentage" />
-            <TableColumn fx:id="tblCell_auslastung" prefWidth="75.0" text="Auslastung" />
+            <TableColumn fx:id="tblCell_puffer" prefWidth="75.0" text="Puffer" />
             <TableColumn fx:id="tblCell_kompk" prefWidth="75.0" text="Kosten" />
          </columns>
       </TableView>
-      <ComboBox fx:id="choice_phasenname" layoutX="12.0" layoutY="323.0" prefHeight="25.0" prefWidth="140.0" />
+      <ComboBox fx:id="choice_phasenname" layoutX="167.0" layoutY="323.0" prefHeight="25.0" prefWidth="140.0" visible="false" />
+      <TextField fx:id="text_phasenname" layoutX="13.0" layoutY="323.0" onAction="#phasenname_uebernehmen" prefHeight="25.0" prefWidth="212.0" />
    </children>
 </AnchorPane>
